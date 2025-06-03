@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Dashboard</h1>
+<p>Welcome, {{ user.username }}!</p>
+
+<div class="dashboard-widgets">
+    <div class="widget">
+        <h2>Tournaments</h2>
+        <p>You have {{ tournaments|length }} tournaments.</p>
+        <a href="{{ url_for('tournaments') }}" class="btn">View All</a>
+        <a href="{{ url_for('new_tournament') }}" class="btn">Create New</a>
+    </div>
+    
+    <div class="widget">
+        <h2>Teams</h2>
+        <p>Total teams registered: {{ teams|length }}</p>
+        <a href="{{ url_for('teams') }}" class="btn">View All</a>
+        <a href="{{ url_for('new_team') }}" class="btn">Register New</a>
+    </div>
+    
+    <div class="widget">
+        <h2>Venues</h2>
+        <p>Available venues: {{ venues|length }}</p>
+        <a href="{{ url_for('venues') }}" class="btn">View All</a>
+        <a href="{{ url_for('new_venue') }}" class="btn">Add New</a>
+    </div>
+    
+    <div class="widget">
+        <h2>Upcoming Matches</h2>
+        <ul class="dashboard-list">
+            {% for match in matches if match.status == 'Scheduled' %}
+                <li>
+                    <span>{{ match.team1.name }} vs {{ match.team2.name }}</span>
+                    <span>{{ match.match_date.strftime('%b %d, %Y') }}</span>
+                </li>
+            {% else %}
+                <li>No upcoming matches.</li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('matches') }}" class="btn">View All</a>
+        <a href="{{ url_for('new_match') }}" class="btn">Schedule New</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="card-title">Recent Match Results</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tournament</th>
+                <th>Teams</th>
+                <th>Date</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in matches if match.status == 'Completed' %}
+                <tr>
+                    <td>{{ match.tournament.name }}</td>
+                    <td>{{ match.team1.name }} vs {{ match.team2.name }}</td>
+                    <td>{{ match.match_date.strftime('%b %d, %Y') }}</td>
+                    <td>{{ match.result.team1_score }} - {{ match.result.team2_score }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">No completed matches.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

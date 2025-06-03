@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-actions">
+    <h1>Matches</h1>
+    {% if session.get('user_id') %}
+    <a href="{{ url_for('new_match') }}" class="btn">Schedule New Match</a>
+    {% endif %}
+</div>
+
+<div class="filter-controls">
+    <label for="tournament-filter">Filter by Tournament:</label>
+    <select id="tournament-filter">
+        <option value="all">All Tournaments</option>
+        {% for tournament in tournaments %}
+        <option value="{{ tournament.id }}">{{ tournament.name }}</option>
+        {% endfor %}
+    </select>
+    
+    <label for="status-filter">Filter by Status:</label>
+    <select id="status-filter">
+        <option value="all">All Statuses</option>
+        <option value="Scheduled">Scheduled</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+    </select>
+</div>
+
+{% if matches %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tournament</th>
+            <th>Teams</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Result</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for match in matches %}
+        <tr class="match-row" data-tournament-id="{{ match.tournament_id }}" data-status="{{ match.status }}">
+            <td>{{ match.tournament.name }}</td>
+            <td>{{ match.team1.name }} vs {{ match.team2.name }}</td>
+            <td>{{ match.match_date.strftime('%B %d, %Y') }}</td>
+            <td>
+                <span class="match-status status-{{ match.status.lower() }}">{{ match.status }}</span>
+            </td>
+            <td>
+                {% if match.result %}
+                    {{ match.result.team1_score }} - {{ match.result.team2_score }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if session.get('user_id') and match.status != 'Completed' %}
+                <a href="{{ url_for('match_result', id=match.id) }}" class="btn btn-small">Record Result</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No matches found.</p>
+{% endif %}
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tournamentFilter = document.getElementById('tournament-filter');
+        const statusFilter = document.getElementById('status-filter');
+        const matchRows = document.querySelectorAll('.match-row');
+        
+        function filterMatches() {
+            const tournamentValue = tournamentFilter.value;
+            const statusValue = statusFilter.value;
+            
+            matchRows.forEach(row => {
+                const tournamentMatch = tournamentValue === 'all' || row.dataset.tournamentId === tournamentValue;
+                const statusMatch = statusValue === 'all' || row.dataset.status === statusValue;
+                
+                if (tournamentMatch && statusMatch) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        tournamentFilter.addEventListener('change', filterMatches);
+        statusFilter.addEventListener('change', filterMatches);
+    });
+</script>
+{% endblock %}

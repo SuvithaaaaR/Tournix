@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="team-header">
+    <h1>{{ team.name }}</h1>
+    
+    {% if session.get('user_id') %}
+    <div class="header-actions">
+        <a href="{{ url_for('edit_team', id=team.id) }}" class="btn">Edit Team</a>
+        <a href="{{ url_for('new_player') }}" class="btn">Add Player</a>
+        
+        <form action="{{ url_for('delete_team', id=team.id) }}" method="POST" class="inline-form">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this team?')">Delete Team</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<div class="team-details">
+    <div class="card">
+        <h2 class="card-title">Team Information</h2>
+        <div class="card-content">
+            <p><strong>Tournament:</strong> {{ team.tournament.name }}</p>
+            <p><strong>Record:</strong> {{ team.wins }} wins, {{ team.losses }} losses, {{ team.draws }} draws</p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2 class="card-title">Players ({{ players|length }})</h2>
+        
+        {% if players %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Position</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                <tr>
+                    <td>{{ player.name }}</td>
+                    <td>{{ player.position }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No players have been added to this team yet.</p>
+        {% endif %}
+        
+        {% if session.get('user_id') %}
+        <a href="{{ url_for('new_player') }}" class="btn">Add Player</a>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h2 class="card-title">Upcoming Matches</h2>
+        
+        {% set upcoming_matches = team.tournament.matches|selectattr('status', 'equalto', 'Scheduled')
+                                |selectattr('team1_id', 'equalto', team.id)|list 
+                                + team.tournament.matches|selectattr('status', 'equalto', 'Scheduled')
+                                |selectattr('team2_id', 'equalto', team.id)|list %}
+        
+        {% if upcoming_matches %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Opponent</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in upcoming_matches %}
+                <tr>
+                    <td>
+                        {% if match.team1_id == team.id %}
+                            {{ match.team2.name }}
+                        {% else %}
+                            {{ match.team1.name }}
+                        {% endif %}
+                    </td>
+                    <td>{{ match.match_date.strftime('%B %d, %Y') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No upcoming matches scheduled for this team.</p>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h2 class="card-title">Match History</h2>
+        
+        {% set completed_matches = team.tournament.matches|selectattr('status', 'equalto', 'Completed')
+                                |selectattr('team1_id', 'equalto', team.id)|list 
+                                + team.tournament.matches|selectattr('status', 'equalto', 'Completed')
+                                |selectattr('team2_id', 'equalto', team.id)|list %}
+        
+        {% if completed_matches %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Opponent</th>
+                    <th>Date</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in completed_matches %}
+                <tr>
+                    <td>
+                        {% if match.team1_id == team.id %}
+                            {{ match.team2.name }}
+                        {% else %}
+                            {{ match.team1.name }}
+                        {% endif %}
+                    </td>
+                    <td>{{ match.match_date.strftime('%B %d, %Y') }}</td>
+                    <td>
+                        {% if match.team1_id == team.id %}
+                            {{ match.result.team1_score }} - {{ match.result.team2_score }}
+                            {% if match.result.team1_score > match.result.team2_score %}
+                                (Win)
+                            {% elif match.result.team1_score < match.result.team2_score %}
+                                (Loss)
+                            {% else %}
+                                (Draw)
+                            {% endif %}
+                        {% else %}
+                            {{ match.result.team2_score }} - {{ match.result.team1_score }}
+                            {% if match.result.team2_score > match.result.team1_score %}
+                                (Win)
+                            {% elif match.result.team2_score < match.result.team1_score %}
+                                (Loss)
+                            {% else %}
+                                (Draw)
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No completed matches for this team.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

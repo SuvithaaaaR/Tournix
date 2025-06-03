@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Sports Tournament Management System</h1>
+        <p>Manage tournaments, teams, and matches with ease</p>
+        <div class="hero-buttons">
+            {% if session.get('user_id') %}
+                <a href="{{ url_for('dashboard') }}" class="btn">Go to Dashboard</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn">Login</a>
+            {% endif %}
+            <a href="{{ url_for('tournaments') }}" class="btn">View Tournaments</a>
+        </div>
+    </div>
+</section>
+
+<section class="featured-tournaments">
+    <h2>Current Tournaments</h2>
+    
+    {% if tournaments %}
+        <div class="tournament-list">
+            {% for tournament in tournaments %}
+                <div class="tournament-card">
+                    <h3>{{ tournament.name }}</h3>
+                    <p><strong>Sport:</strong> {{ tournament.sport_type }}</p>
+                    <p><strong>Dates:</strong> {{ tournament.start_date.strftime('%B %d, %Y') }} - {{ tournament.end_date.strftime('%B %d, %Y') }}</p>
+                    <p><strong>Venue:</strong> {{ tournament.venue.name }}</p>
+                    <a href="{{ url_for('tournament_details', id=tournament.id) }}" class="btn">View Details</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-data">No tournaments available at this time.</p>
+    {% endif %}
+</section>
+
+<section class="features">
+    <h2>Features</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <h3>Tournament Management</h3>
+            <p>Create and manage tournaments with detailed information.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Team Registration</h3>
+            <p>Register teams and assign them to tournaments.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Match Scheduling</h3>
+            <p>Schedule matches between teams and track results.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Live Scoreboards</h3>
+            <p>Update match scores in real-time and display leaderboards.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

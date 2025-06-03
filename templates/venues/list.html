@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-actions">
+    <h1>Venues</h1>
+    {% if session.get('user_id') %}
+    <a href="{{ url_for('new_venue') }}" class="btn">Add New Venue</a>
+    {% endif %}
+</div>
+
+{% if venues %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Capacity</th>
+            <th>Tournaments</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for venue in venues %}
+        <tr>
+            <td>{{ venue.name }}</td>
+            <td>{{ venue.address }}</td>
+            <td>{{ venue.capacity }}</td>
+            <td>{{ venue.tournaments|length }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No venues found.</p>
+{% endif %}
+{% endblock %}

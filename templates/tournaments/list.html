@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-actions">
+    <h1>Tournaments</h1>
+    {% if session.get('user_id') %}
+    <a href="{{ url_for('new_tournament') }}" class="btn">Create Tournament</a>
+    {% endif %}
+</div>
+
+{% if tournaments %}
+<div class="tournament-list">
+    {% for tournament in tournaments %}
+    <div class="tournament-card">
+        <h2>{{ tournament.name }}</h2>
+        <p><strong>Sport:</strong> {{ tournament.sport_type }}</p>
+        <p><strong>Dates:</strong> {{ tournament.start_date.strftime('%B %d, %Y') }} - {{ tournament.end_date.strftime('%B %d, %Y') }}</p>
+        <p><strong>Venue:</strong> {{ tournament.venue.name }}</p>
+        <p><strong>Teams:</strong> {{ tournament.teams|length }}</p>
+        
+        <div class="card-actions">
+            <a href="{{ url_for('tournament_details', id=tournament.id) }}" class="btn">View Details</a>
+            {% if session.get('user_id') %}
+            <a href="{{ url_for('edit_tournament', id=tournament.id) }}" class="btn">Edit</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No tournaments found.</p>
+{% endif %}
+{% endblock %}

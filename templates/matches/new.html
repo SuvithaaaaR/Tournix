@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1 class="card-title">Schedule New Match</h1>
+    
+    <form method="POST" action="{{ url_for('new_match') }}">
+        <div class="form-group">
+            <label for="tournament_id" class="form-label">Tournament</label>
+            <select id="tournament_id" name="tournament_id" class="form-control" required>
+                <option value="">Select Tournament</option>
+                {% for tournament in tournaments %}
+                <option value="{{ tournament.id }}">{{ tournament.name }} ({{ tournament.sport_type }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="team1_id" class="form-label">Team 1</label>
+            <select id="team1_id" name="team1_id" class="form-control" required>
+                <option value="">Select Team 1</option>
+                {% for team in teams %}
+                <option value="{{ team.id }}" data-tournament-id="{{ team.tournament_id }}">{{ team.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="team2_id" class="form-label">Team 2</label>
+            <select id="team2_id" name="team2_id" class="form-control" required>
+                <option value="">Select Team 2</option>
+                {% for team in teams %}
+                <option value="{{ team.id }}" data-tournament-id="{{ team.tournament_id }}">{{ team.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="match_date" class="form-label">Match Date</label>
+            <input type="date" id="match_date" name="match_date" class="form-control" required>
+        </div>
+        
+        <button type="submit" class="btn">Schedule Match</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tournamentSelect = document.getElementById('tournament_id');
+        const team1Select = document.getElementById('team1_id');
+        const team2Select = document.getElementById('team2_id');
+        
+        // Hide team options initially
+        Array.from(team1Select.options).forEach(option => {
+            if (option.value) option.style.display = 'none';
+        });
+        
+        Array.from(team2Select.options).forEach(option => {
+            if (option.value) option.style.display = 'none';
+        });
+        
+        // Filter teams by selected tournament
+        tournamentSelect.addEventListener('change', function() {
+            const tournamentId = this.value;
+            
+            Array.from(team1Select.options).forEach(option => {
+                if (!option.value) return;
+                
+                if (option.dataset.tournamentId === tournamentId) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+            
+            Array.from(team2Select.options).forEach(option => {
+                if (!option.value) return;
+                
+                if (option.dataset.tournamentId === tournamentId) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+            
+            team1Select.selectedIndex = 0;
+            team2Select.selectedIndex = 0;
+        });
+        
+        // Prevent selecting same team for both sides
+        team1Select.addEventListener('change', function() {
+            const selectedTeam = this.value;
+            
+            Array.from(team2Select.options).forEach(option => {
+                if (option.value === selectedTeam) {
+                    option.disabled = true;
+                } else {
+                    option.disabled = false;
+                }
+            });
+        });
+        
+        team2Select.addEventListener('change', function() {
+            const selectedTeam = this.value;
+            
+            Array.from(team1Select.options).forEach(option => {
+                if (option.value === selectedTeam) {
+                    option.disabled = true;
+                } else {
+                    option.disabled = false;
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

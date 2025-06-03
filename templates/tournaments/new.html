@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1 class="card-title">Create New Tournament</h1>
+    
+    <form method="POST" action="{{ url_for('new_tournament') }}">
+        <div class="form-group">
+            <label for="name" class="form-label">Tournament Name</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="sport_type" class="form-label">Sport Type</label>
+            <input type="text" id="sport_type" name="sport_type" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="start_date" class="form-label">Start Date</label>
+            <input type="date" id="start_date" name="start_date" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="end_date" class="form-label">End Date</label>
+            <input type="date" id="end_date" name="end_date" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="venue_id" class="form-label">Venue</label>
+            <select id="venue_id" name="venue_id" class="form-control" required>
+                <option value="">Select Venue</option>
+                {% for venue in venues %}
+                <option value="{{ venue.id }}">{{ venue.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <button type="submit" class="btn">Create Tournament</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1 class="card-title">Record Match Result</h1>
+    <h2>{{ match.team1.name }} vs {{ match.team2.name }}</h2>
+    <p>Tournament: {{ match.tournament.name }}</p>
+    <p>Date: {{ match.match_date.strftime('%B %d, %Y') }}</p>
+    
+    <form method="POST" action="{{ url_for('match_result', id=match.id) }}">
+        <div class="score-input">
+            <div class="team-score">
+                <label for="team1_score" class="form-label">{{ match.team1.name }} Score</label>
+                <input type="number" id="team1_score" name="team1_score" class="form-control" min="0" required>
+            </div>
+            
+            <div class="score-separator">vs</div>
+            
+            <div class="team-score">
+                <label for="team2_score" class="form-label">{{ match.team2.name }} Score</label>
+                <input type="number" id="team2_score" name="team2_score" class="form-control" min="0" required>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn">Record Result</button>
+    </form>
+</div>
+{% endblock %}
